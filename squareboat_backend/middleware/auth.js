@@ -1,8 +1,7 @@
 import jwt from 'jsonwebtoken'
 import logger from '../common/logger'
-import redis from '../config/redis'
+// import redis from '../config/redis'
 
-// const value = await client.get('key');
 
 
 
@@ -22,17 +21,15 @@ export default auth = async(req, res, next) => {
   try {
     const decoded = jwt.verify(token,process.env.SECRET_KEY);
 
-    let client = await redis;
+    // let client = await redis;
 
-    let active_token =  await client.get(decoded.user._id);
+    // let active_token =  await client.get(decoded.user._id);
 
-    console.log("active_token:::" , active_token)
-
-    if(JSON.stringify(active_token) !== JSON.stringify(token)){
-      return res.status(401).json({
-        message: "User Unauthorised",
-      });
-    }
+    // if(JSON.stringify(active_token) !== JSON.stringify(token)){
+    //   return res.status(401).json({
+    //     message: "User Unauthorised",
+    //   });
+    // }
 
     req.user = decoded.user;
     next();

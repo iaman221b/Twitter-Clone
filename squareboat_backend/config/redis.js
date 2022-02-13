@@ -1,7 +1,7 @@
 import { createClient } from 'redis';
 
 let client =  (async () => {
-  const client = createClient();
+  const client = createClient(process.env.REDIS_URL);
 
   client.on('error', (err) => console.log('Redis Client Error', err));
 

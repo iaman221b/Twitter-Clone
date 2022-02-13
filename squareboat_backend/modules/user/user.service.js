@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import moment from "moment";
 import { User } from "./user.model";
 import {RESPONSE} from "../../common/responseHandler"
-import redis from '../../config/redis'
+// import redis from '../../config/redis'
 import { validators } from "../../common/validators";
 import BaseDao from "../../common/dao/index";
 const userDao = new BaseDao(User);
@@ -106,11 +106,11 @@ const JwtSignIn = (payload) => {
             expiration: moment().add(30, "days").unix(),
           };
 
-          let client = await redis;
+          // let client = await redis;
 
-          await client.set(payload.user._id ,  token); 
-          const value = await client.get(payload.user.id);
-          console.log("value:eeeeeeee " + value);
+          // await client.set(payload.user._id ,  token); 
+          // const value = await client.get(payload.user.id);
+          
           resolve(data);
         }
       );

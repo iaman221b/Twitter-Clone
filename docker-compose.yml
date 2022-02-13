@@ -7,7 +7,8 @@ services:
       context: ./squareboat_backend
       dockerfile: dockerfile
     environment:
-      HOST: 0.0.0.0
+      HOST: 0.0.0.0  
+      REDIS_URL: redis://cache
     ports:
       - 3001:3001
     volumes:
@@ -31,20 +32,25 @@ services:
     env_file:
       - ./squareboat-frontend/.env
 
-  cache:
-    image: redis:6.2-alpine
-    restart: always
-    ports:
-      - '6379:6379'
-    environment:
-      REDIS_HOST: cache
-      REDIS_PORT: 6379
-      REDIS_PASSWORD: eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
-    command: redis-server --save 20 1 --loglevel warning --requirepass eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
-    volumes: 
-      - cache:/data
-volumes:
-  cache:
-    driver: local
+#   cache:
+#     image: redis:6.2-alpine
+#     restart: on-failure
+#     ports:
+#       - '6379:6379'
+#     environment:
+#       REDIS_HOST: cache
+#       REDIS_PORT: 6379
+#       REDIS_PASSWORD: eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
+#     command: redis-server --save 20 1 --loglevel warning --requirepass eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
+#     volumes: 
+#       - cache:/data
+# volumes:
+#   cache:
+#     driver: local
 
   
+  redis:
+    image: redis
+    container_name: redis-server
+    expose:
+      - 6379
