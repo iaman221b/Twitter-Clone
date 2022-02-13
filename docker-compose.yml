@@ -49,8 +49,8 @@ services:
 #     driver: local
 
   
-  redis:
-    image: redis
-    container_name: redis-server
-    expose:
-      - 6379
+  # redis:
+  #   image: redis
+  #   container_name: redis-server
+  #   expose:
+  #     - 6379
