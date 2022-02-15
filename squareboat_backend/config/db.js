@@ -15,6 +15,8 @@ const connectDB = async () => {
         console.log("connection error:::", error);
       });
 
+    mongoose.set('useCreateIndex', true);
+
     console.log("mongo DB connected");
 
     mongoose.set(

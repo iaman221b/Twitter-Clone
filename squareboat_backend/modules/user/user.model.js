@@ -17,8 +17,13 @@ const UserSchema = new mongoose.Schema({
   following: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
   created: {
     type: Date,
-    default: Date.now
+    default: Date.now,
+    index:true
   }
 });
+
+UserSchema.index({ created: -1 }); // schema level
+
+
 
 export const User = mongoose.model("User", UserSchema);

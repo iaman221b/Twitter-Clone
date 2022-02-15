@@ -13,8 +13,12 @@ const FeedSchema = new mongoose.Schema({
   },
   created: {
     type: Date,
-    default: Date.now
+    default: Date.now, 
+    index:true  // field level
   }
 })
+
+FeedSchema.index({ created: -1 }); // schema level
+
 
 export const Feeds = mongoose.model('Feed' , FeedSchema);

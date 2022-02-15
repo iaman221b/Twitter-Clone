@@ -2,7 +2,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import moment from "moment";
 import { User } from "./user.model";
-import {RESPONSE} from "../../common/responseHandler"
+import { RESPONSE } from "../../common/responseHandler";
 // import redis from '../../config/redis'
 import { validators } from "../../common/validators";
 import BaseDao from "../../common/dao/index";
@@ -13,7 +13,6 @@ const createUser = async (req, res) => {
     let { name, email, password, mobile } = req.body;
 
     try {
-
       let user = await userDao.findOne({ email });
 
       if (user) {
@@ -40,15 +39,15 @@ const createUser = async (req, res) => {
         user: {
           _id: user.id,
           password: user.password,
-          email:user.email,
-          following:user.following
+          email: user.email,
+          following: user.following,
         },
       };
 
       resolve(payload);
     } catch (error) {
       console.log(error.message);
-      return RESPONSE.ServerError(res)
+      return RESPONSE.ServerError(res);
     }
   });
 };
@@ -73,16 +72,16 @@ const login = async (req, res) => {
       let payload = {
         user: {
           _id: user.id,
-          password:user.password,
-          email:user.email,
-          following:user.following
+          password: user.password,
+          email: user.email,
+          following: user.following,
         },
       };
 
       resolve(payload);
     } catch (error) {
       console.log(error.message);
-      return RESPONSE.ServerError(res)
+      return RESPONSE.ServerError(res);
     }
   });
 };
@@ -94,7 +93,7 @@ const JwtSignIn = (payload) => {
         payload,
         process.env.SECRET_KEY,
         { expiresIn: 3600000 },
-        async(err, token) => {
+        async (err, token) => {
           if (err) {
             console.log(err);
           }
@@ -108,108 +107,132 @@ const JwtSignIn = (payload) => {
 
           // let client = await redis;
 
-          // await client.set(payload.user._id ,  token); 
+          // await client.set(payload.user._id ,  token);
           // const value = await client.get(payload.user.id);
-          
+
           resolve(data);
         }
       );
     } catch (error) {
-      return RESPONSE.ServerError(res)
+      return RESPONSE.ServerError(res);
     }
   });
 };
 
-
-const followUser = (req , res) => {
+const followUser = (req, res) => {
   return new Promise(async (resolve, reject) => {
     try {
+      let email = req.user.email;
 
-      let email = req.user.email
-
-      let {followerId} = req.body
+      let { followerId } = req.body;
 
       let user = await User.findOne({ email });
 
-      user.following.unshift(followerId)
+      user.following.unshift(followerId);
 
       await userDao.save(user);
 
-      resolve(true)
-     
+      resolve(true);
     } catch (error) {
+      console.log("error:::", error);
 
-      console.log("error:::" , error);
-
-      return RESPONSE.ServerError(res)
+      return RESPONSE.ServerError(res);
     }
   });
 };
 
-const unFollowUser = (req , res) => {
+const unFollowUser = (req, res) => {
   return new Promise(async (resolve, reject) => {
     try {
+      let email = req.user.email;
 
-      let email = req.user.email
-
-      let {followerId} = req.body
+      let { followerId } = req.body;
 
       let user = await User.findOne({ email });
 
-     
-     const removeIndex = user.following
-     .indexOf(followerId)
-  
-      user.following.splice(removeIndex, 1)
+      const removeIndex = user.following.indexOf(followerId);
 
-      console.log(user.following)
+      user.following.splice(removeIndex, 1);
+
+      console.log(user.following);
 
       await userDao.save(user);
 
-      resolve(true)
-     
+      resolve(true);
     } catch (error) {
+      console.log("error:::", error);
 
-      console.log("error:::" , error);
-
-      return RESPONSE.ServerError(res)
+      return RESPONSE.ServerError(res);
     }
   });
 };
 
-const getUser = async(req , res) => {
-
-  let {email} = req.user
+const getUser = async (req, res) => {
+  let { email } = req.user;
 
   let user = await userDao.findOne({ email });
 
-  return user
+  return user;
+};
 
-}
+// const _getUserListing = async (req, res) => {
+//   try {
+//     let user = await getUser(req, res);
 
-const getUserListing = async(req , res) => {
-  try {
-    let user = await getUser(req , res);
+//     console.log("user::", user);
 
-    console.log("user::" , user);
+//     req.user = user;
 
-    req.user = user
+//     let query = {};
+//     query._id = { $ne: validators.convertToObjectIds(user._id) };
 
-    let query = {}
-    query._id = { $ne: validators.convertToObjectIds(user._id) }
-    
-  let users = await User.find(query , {"name":1 , "email":1 , "isFollowing":1}).sort({created : -1}).lean().exec();
-  // let users = await userDao.find(query , {"name":1 , "email":1 , "isFollowing":1});
+//     query = {
+//       $and: [
+//         { _id: { $ne: validators.convertToObjectIds(user._id) } },
+//         { following: { $in: [validators.convertToObjectIds(user._id)] } },
+//       ],
+//     };
 
-  return users
-    
-  } catch (error) {
+//     let users = await User.find(query, { name: 1, email: 1, isFollowing: 1 })
+//       .sort({ created: -1 })
+//       .lean()
+//       .exec();
+//     // let users = await userDao.find(query , {"name":1 , "email":1 , "isFollowing":1});
 
-    console.log("error:::" , error);
-    
-  }
-}
+//     return users;
+//   } catch (error) {
+//     console.log("error:::", error);
+//   }
+// };
 
+const getUserListing = async (req, res, next) => {
+
+  let user = await getUser(req, res,);
+
+  req.user = user;
+
+
+  let pipeline = [];
+  let query = { _id: { $ne: validators.convertToObjectIds(user._id) } };
+  let sort = { created: -1 };
+
+  pipeline.push({ $match: query });
+  pipeline.push({ $sort: sort });
+
+  let projection = {
+    name: 1,
+    email: 1,
+    created: 1,
+    id_:1,
+    isFollowing: {
+      $in: ["$_id", user.following],
+    },
+  };
+
+  pipeline.push({ $project: projection });
+
+  return userDao.aggregate(pipeline);
+};
 
 export const UserService = {
   createUser,
@@ -218,5 +241,7 @@ export const UserService = {
   followUser,
   unFollowUser,
   getUser,
-  getUserListing
+  getUserListing,
 };
+
+

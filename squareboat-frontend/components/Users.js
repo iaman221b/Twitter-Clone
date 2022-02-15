@@ -97,7 +97,7 @@ const UsersListing = () => {
                       <h3>{data.name}</h3>
                       <h4>{data.email}</h4>
                       <button className="btn btn-success btn-rounded text-white text-uppercase font-14" onClick={() =>followUser(index , data  , data.isFollowing ? "UnFollow" : "Follow")}>
-                        <i className={`fa mr-2 ${data.isFollowing ? "fa-minus" : "fa-plus"}`}></i> {data.isFollowing ? "UnFollow" : "Follow"}
+                        <i className={`fa mr-2 ${data.isFollowing ? "fa-minus" : "fa-plus"}`}></i> {data.isFollowing ? "UnFollow" : "Follow"} 
                       </button>
                       {/* <button className="btn btn-success btn-rounded text-white text-uppercase font-14"><i className="fa fa-minus mr-2"></i> Follow</button> */}
                     </div>
